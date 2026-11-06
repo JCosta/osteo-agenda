@@ -66,8 +66,8 @@ public sealed class ContactQueries(AgendaDbContext db, TimeProvider clock)
             else
             {
                 var pattern = "%" + term.Replace("\\", "\\\\").Replace("%", "\\%").Replace("_", "\\_") + "%";
-                query = query.Where(c => EF.Functions.ILike(c.Name, pattern)
-                    || c.Patients.Any(p => EF.Functions.ILike(p.Name, pattern)));
+                query = query.Where(c => EF.Functions.ILike(EF.Functions.Unaccent(c.Name), EF.Functions.Unaccent(pattern))
+                    || c.Patients.Any(p => EF.Functions.ILike(EF.Functions.Unaccent(p.Name), EF.Functions.Unaccent(pattern))));
             }
         }
 

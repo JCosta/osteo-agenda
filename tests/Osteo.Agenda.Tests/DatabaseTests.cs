@@ -178,8 +178,11 @@ public sealed class DatabaseTests : IAsyncLifetime
             Assert.Equal(2, profile.Summary.Completed);
             Assert.Equal(At(-30, 10), profile.Summary.LastVisit);
 
-            var search = await new ContactQueries(db, TimeProvider.System).SearchAsync("Inês");
-            Assert.Equal(mother.Id, Assert.Single(search).Id);
+            var queries = new ContactQueries(db, TimeProvider.System);
+            Assert.Equal(mother.Id, Assert.Single(await queries.SearchAsync("Inês")).Id);
+            Assert.Equal(mother.Id, Assert.Single(await queries.SearchAsync("ines")).Id); // sem acento
+            Assert.Equal(mother.Id, Assert.Single(await queries.SearchAsync("TOMAS")).Id);
+            Assert.Equal(maria.Id, Assert.Single(await queries.SearchAsync("912 345")).Id);
         }
 
         // Second run: nothing new.

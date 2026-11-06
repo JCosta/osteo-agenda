@@ -15,7 +15,7 @@ export Admin__PasswordHash="$HASH"
 export ASPNETCORE_URLS="http://127.0.0.1:5080"
 export ASPNETCORE_ENVIRONMENT=Production
 
-dotnet publish-out/Osteo.Agenda.Web.dll > "$OUT/app.log" 2>&1 &
+(cd publish-out && exec dotnet Osteo.Agenda.Web.dll) > "$OUT/app.log" 2>&1 &
 APP=$!
 trap 'kill $APP 2>/dev/null || true' EXIT
 
