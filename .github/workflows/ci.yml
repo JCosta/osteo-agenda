@@ -42,6 +42,14 @@ jobs:
           set -o pipefail
           docker build -t osteo-agenda . 2>&1 | tail -n 60 | tee docker.log
 
+      - name: Smoke test (app + login + pages)
+        id: smoke
+        if: steps.test.outcome == 'success'
+        shell: bash
+        run: |
+          dotnet publish src/Osteo.Agenda.Web/Osteo.Agenda.Web.csproj -c Release -o publish-out
+          ci/smoke.sh
+
       # Publishes the logs to the ci-results branch so they can be read without Actions access.
       - name: Publish results
         if: always() && github.event_name == 'push'
@@ -53,11 +61,13 @@ jobs:
             echo "ref: ${GITHUB_REF}"
             echo "test: ${{ steps.test.outcome }}"
             echo "docker: ${{ steps.docker.outcome }}"
+            echo "smoke: ${{ steps.smoke.outcome }}"
             echo "run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
           } > /tmp/results/summary.txt
           [ -f test.log ] && grep -E "error|warn|Failed|Passed|Total tests|failed|passed|Error Message|Assert|at Osteo" test.log | grep -v "^\s*$" | head -n 400 > /tmp/results/test-highlights.log || true
           [ -f test.log ] && tail -n 300 test.log > /tmp/results/test-tail.log || true
           [ -f docker.log ] && cp docker.log /tmp/results/docker.log || true
+          [ -d smoke ] && cp -r smoke /tmp/results/smoke || true
           cd /tmp/results
           git init -q
           git config user.name "ci"
