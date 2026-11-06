@@ -50,7 +50,7 @@ public sealed class AgendaDbContext(DbContextOptions<AgendaDbContext> options)
             e.Property(a => a.Version).IsConcurrencyToken();
         });
 
-        b.Entity<AppointmentEvent>().Property(x => x.Data).HasColumnType("jsonb");
+        b.Entity<AppointmentEvent>().HasOne<Appointment>().WithMany().HasForeignKey(x => x.AppointmentId);
         b.Entity<Service>().Property(x => x.Price).HasPrecision(10, 2);
         b.Entity<WorkingHours>().Property(x => x.DayOfWeek).HasConversion<int>();
 
