@@ -1,0 +1,6 @@
+commit: 44618e3ea7e8a82045a4249ec7daab91562459f2
+ref: refs/heads/main
+test: success
+docker: success
+smoke: success
+run: https://github.com/JCosta/osteo-agenda/actions/runs/42256180809

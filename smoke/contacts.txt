@@ -1,0 +1,23 @@
+ Clientes · Agenda 
+ Agenda 
+ Hoje 
+ Clientes 
+ Importar 
+ Sair 
+ Clientes 
+ Pesquisar 
+ Nome 
+ Telefone 
+ Canal 
+ Próxima 
+ Última 
+ Ana Costa 
+ 933 000 111 
+ SMS 
+ 09/11/2026 16:52 
+ 27/10/2026 
+ Maria Silva 
+ 912 345 678 
+ WhatsApp 
+ 15/11/2026 16:52 
+ 07/09/2026 

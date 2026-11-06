@@ -1,0 +1,48 @@
+  Determining projects to restore...
+  Restored /home/runner/work/osteo-agenda/osteo-agenda/src/Osteo.Agenda.Core/Osteo.Agenda.Core.csproj (in 2.2 sec).
+  Restored /home/runner/work/osteo-agenda/osteo-agenda/src/Osteo.Agenda.Web/Osteo.Agenda.Web.csproj (in 2.2 sec).
+  Restored /home/runner/work/osteo-agenda/osteo-agenda/tests/Osteo.Agenda.Tests/Osteo.Agenda.Tests.csproj (in 2.2 sec).
+  Osteo.Agenda.Core -> /home/runner/work/osteo-agenda/osteo-agenda/src/Osteo.Agenda.Core/bin/Release/net10.0/Osteo.Agenda.Core.dll
+  Osteo.Agenda.Tests -> /home/runner/work/osteo-agenda/osteo-agenda/tests/Osteo.Agenda.Tests/bin/Release/net10.0/Osteo.Agenda.Tests.dll
+Test run for /home/runner/work/osteo-agenda/osteo-agenda/tests/Osteo.Agenda.Tests/bin/Release/net10.0/Osteo.Agenda.Tests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v3.1.4+50e68bbb8b (64-bit .NET 10.0.14)
+[xUnit.net 00:00:00.10]   Discovering: Osteo.Agenda.Tests
+[xUnit.net 00:00:00.16]   Discovered:  Osteo.Agenda.Tests
+[xUnit.net 00:00:00.19]   Starting:    Osteo.Agenda.Tests
+  Passed Osteo.Agenda.Tests.ImportPlannerTests.Re_running_is_unchanged_or_update_never_create [28 ms]
+  Passed Osteo.Agenda.Tests.ImportPlannerTests.Green_or_check_means_confirmed_and_orange_means_reschedule [5 ms]
+  Passed Osteo.Agenda.Tests.ImportPlannerTests.Future_overlaps_keep_the_first_and_skip_the_second [6 ms]
+  Passed Osteo.Agenda.Tests.ImportPlannerTests.App_decisions_like_cancel_are_not_overwritten [< 1 ms]
+  Passed Osteo.Agenda.Tests.ImportPlannerTests.Same_phone_with_different_names_is_a_warning_not_a_skip [1 ms]
+  Passed Osteo.Agenda.Tests.ImportPlannerTests.Past_overlaps_are_kept_as_history [< 1 ms]
+  Passed Osteo.Agenda.Tests.ImportPlannerTests.Events_without_phone_or_all_day_are_skipped [< 1 ms]
+  Passed Osteo.Agenda.Tests.ImportPlannerTests.Appointments_inside_a_block_are_skipped [2 ms]
+  Passed Osteo.Agenda.Tests.ImportPlannerTests.Past_events_become_completed_and_future_booked [< 1 ms]
+  Passed Osteo.Agenda.Tests.TitleParserTests.Too_short_number_is_raw_but_invalid [< 1 ms]
+  Passed Osteo.Agenda.Tests.TitleParserTests.Detects_blocks(title: "Férias #BLOQUEIO") [< 1 ms]
+  Passed Osteo.Agenda.Tests.TitleParserTests.Detects_blocks(title: "#bloqueio") [< 1 ms]
+  Passed Osteo.Agenda.Tests.TitleParserTests.Detects_blocks(title: "#bloqueio Dentista") [< 1 ms]
+  Passed Osteo.Agenda.Tests.TitleParserTests.Display_formats_portuguese_numbers [< 1 ms]
+  Passed Osteo.Agenda.Tests.TitleParserTests.Classifies_portuguese_numbers(raw: "912345678", type: Mobile) [2 ms]
+  Passed Osteo.Agenda.Tests.TitleParserTests.Classifies_portuguese_numbers(raw: "+351 253 123 456", type: Landline) [< 1 ms]
+  Passed Osteo.Agenda.Tests.TitleParserTests.Classifies_portuguese_numbers(raw: "253123456", type: Landline) [< 1 ms]
+  Passed Osteo.Agenda.Tests.TitleParserTests.Detects_confirmed_prefix(title: "✔️ Maria #912345678") [< 1 ms]
+  Passed Osteo.Agenda.Tests.TitleParserTests.Detects_confirmed_prefix(title: "✅Maria #912345678") [< 1 ms]
+  Passed Osteo.Agenda.Tests.TitleParserTests.Detects_confirmed_prefix(title: "✅ Maria #912345678") [< 1 ms]
+  Passed Osteo.Agenda.Tests.TitleParserTests.Reads_name_and_phone(title: "  Maria   Silva  # +351 912345678 ", name: "Maria Silva", e164: "+351912345678") [< 1 ms]
+  Passed Osteo.Agenda.Tests.TitleParserTests.Reads_name_and_phone(title: "Maria Silva #912345678", name: "Maria Silva", e164: "+351912345678") [< 1 ms]
+  Passed Osteo.Agenda.Tests.TitleParserTests.Reads_name_and_phone(title: "John #+44 7700 900123", name: "John", e164: "+447700900123") [< 1 ms]
+  Passed Osteo.Agenda.Tests.TitleParserTests.Reads_name_and_phone(title: "Tomás #00351912345678", name: "Tomás", e164: "+351912345678") [< 1 ms]
+  Passed Osteo.Agenda.Tests.TitleParserTests.Reads_name_and_phone(title: "Maria Silva #912 345 678", name: "Maria Silva", e164: "+351912345678") [< 1 ms]
+  Passed Osteo.Agenda.Tests.TitleParserTests.Reads_service_and_channel_tags_in_any_order [2 ms]
+  Passed Osteo.Agenda.Tests.TitleParserTests.Missing_phone_is_null [< 1 ms]
+  Passed Osteo.Agenda.Tests.DatabaseTests.Database_rejects_overlapping_active_appointments [879 ms]
+[xUnit.net 00:00:02.61]   Finished:    Osteo.Agenda.Tests
+  Passed Osteo.Agenda.Tests.DatabaseTests.Database_rejects_appointments_inside_a_block [44 ms]
+  Passed Osteo.Agenda.Tests.DatabaseTests.Import_creates_history_and_future_then_is_idempotent [609 ms]
+
+Test Run Successful.
+Total tests: 30
+     Passed: 30
+ Total time: 3.1556 Seconds

@@ -1,0 +1,11 @@
+healthz: 200
+anon /: 302 -> http://127.0.0.1:5080/Login?ReturnUrl=%2F
+login: 200
+login post: 302 -> http://127.0.0.1:5080/
+index: 200
+contacts: 200
+contacts-search-ines: 200
+contacts-search-phone: 200
+details-maria: 200
+details-ana: 200
+import: 200

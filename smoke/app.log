@@ -1,0 +1,12 @@
+warn: Microsoft.AspNetCore.DataProtection.KeyManagement.XmlKeyManager[35]
+      No XML encryptor configured. Key {3035f9fb-3771-43f8-b044-1eb4cd9347c2} may be persisted to storage in unencrypted form.
+info: Microsoft.Hosting.Lifetime[14]
+      Now listening on: http://127.0.0.1:5080
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Production
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: /home/runner/work/osteo-agenda/osteo-agenda/publish-out
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...

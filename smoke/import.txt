@@ -1,0 +1,16 @@
+ Importar do Google Calendar · Agenda 
+ Agenda 
+ Hoje 
+ Clientes 
+ Importar 
+ Sair 
+ Importar do Google Calendar 
+ Lê eventos no formato Nome #Telefone (opcional #Serviço , #sms ; #bloqueio para bloqueios).
+ Passado entra como histórico; futuro entra como marcação. Não é enviada nenhuma mensagem. Pode repetir sem criar duplicados.
+ A ligação ao Google Calendar não está configurada ( GoogleCalendar__ServiceAccountJson ). 
+ Local 
+ Braga 
+ ID do calendário 
+ De 
+ Até 
+ Ver 
