@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Osteo.Agenda.Core.Data;
 using Osteo.Agenda.Core.Domain;
@@ -36,6 +37,19 @@ public sealed record ContactProfile(
 
 public sealed class ContactQueries(AgendaDbContext db, TimeProvider clock)
 {
+    private static readonly Expression<Func<Appointment, AppointmentRow>> ToRow = a => new AppointmentRow(
+        a.Id,
+        a.StartsAt,
+        a.EndsAt,
+        a.Status,
+        a.Patient!.Name,
+        a.Location!.Name,
+        a.Service != null ? a.Service.Name : null,
+        a.Source,
+        a.InternalNotes,
+        a.ContactId,
+        a.Contact!.Name);
+
     public async Task<IReadOnlyList<ContactListItem>> SearchAsync(string? term, int limit = 50, CancellationToken ct = default)
     {
         var now = clock.GetUtcNow().UtcDateTime;
@@ -58,22 +72,31 @@ public sealed class ContactQueries(AgendaDbContext db, TimeProvider clock)
         }
 
         var active = DomainLabels.ActiveStatuses;
-        return await query
-            .Select(c => new ContactListItem(
+        // Anonymous projection (translatable ordering), then map to the record in memory.
+        var rows = await query
+            .Select(c => new
+            {
                 c.Id,
                 c.Name,
                 c.PhoneE164,
                 c.PreferredChannel,
-                db.Appointments.Where(a => a.ContactId == c.Id && a.StartsAt >= now && active.Contains(a.Status))
+                Next = db.Appointments
+                    .Where(a => a.ContactId == c.Id && a.StartsAt >= now && active.Contains(a.Status))
                     .Min(a => (DateTime?)a.StartsAt),
-                db.Appointments.Where(a => a.ContactId == c.Id && a.StartsAt < now && a.Status == AppointmentStatus.Completed)
-                    .Max(a => (DateTime?)a.StartsAt)))
-            .OrderBy(c => c.NextAppointment == null)
-            .ThenBy(c => c.NextAppointment)
-            .ThenByDescending(c => c.LastAppointment)
+                Last = db.Appointments
+                    .Where(a => a.ContactId == c.Id && a.StartsAt < now && a.Status == AppointmentStatus.Completed)
+                    .Max(a => (DateTime?)a.StartsAt),
+            })
+            .OrderBy(c => c.Next == null)
+            .ThenBy(c => c.Next)
+            .ThenByDescending(c => c.Last)
             .ThenBy(c => c.Name)
             .Take(limit)
             .ToListAsync(ct);
+
+        return rows
+            .Select(c => new ContactListItem(c.Id, c.Name, c.PhoneE164, c.PreferredChannel, c.Next, c.Last))
+            .ToList();
     }
 
     public async Task<ContactProfile?> GetProfileAsync(Guid contactId, int historyLimit = 10, CancellationToken ct = default)
@@ -88,50 +111,31 @@ public sealed class ContactQueries(AgendaDbContext db, TimeProvider clock)
             return null;
         }
 
-        var rows = db.Appointments.AsNoTracking()
-            .Where(a => a.ContactId == contactId)
-            .Select(a => new AppointmentRow(
-                a.Id,
-                a.StartsAt,
-                a.EndsAt,
-                a.Status,
-                a.Patient!.Name,
-                a.Location!.Name,
-                a.Service != null ? a.Service.Name : null,
-                a.Source,
-                a.InternalNotes,
-                a.ContactId,
-                a.Contact!.Name));
-
         var active = DomainLabels.ActiveStatuses;
-        var upcoming = await rows
+        var all = db.Appointments.AsNoTracking().Where(a => a.ContactId == contactId);
+
+        // Filter on the entity first, then project: EF cannot translate filters on the projected record.
+        var upcoming = await all
             .Where(a => a.StartsAt >= now && active.Contains(a.Status))
             .OrderBy(a => a.StartsAt)
+            .Select(ToRow)
             .ToListAsync(ct);
 
-        var historyQuery = rows.Where(a => a.StartsAt < now || !active.Contains(a.Status));
+        var historyQuery = all.Where(a => a.StartsAt < now || !active.Contains(a.Status));
         var historyTotal = await historyQuery.CountAsync(ct);
         var history = await historyQuery
             .OrderByDescending(a => a.StartsAt)
             .Take(historyLimit)
+            .Select(ToRow)
             .ToListAsync(ct);
 
-        var stats = await db.Appointments.AsNoTracking()
-            .Where(a => a.ContactId == contactId)
-            .GroupBy(_ => 1)
-            .Select(g => new
-            {
-                Completed = g.Count(a => a.Status == AppointmentStatus.Completed),
-                NoShows = g.Count(a => a.Status == AppointmentStatus.NoShow),
-                Cancelled = g.Count(a => a.Status == AppointmentStatus.Cancelled),
-                First = g.Where(a => a.Status == AppointmentStatus.Completed).Min(a => (DateTime?)a.StartsAt),
-                Last = g.Where(a => a.Status == AppointmentStatus.Completed).Max(a => (DateTime?)a.StartsAt),
-            })
-            .SingleOrDefaultAsync(ct);
-
-        var summary = stats is null
-            ? new ContactSummary(0, 0, 0, null, null)
-            : new ContactSummary(stats.Completed, stats.NoShows, stats.Cancelled, stats.First, stats.Last);
+        var completed = all.Where(a => a.Status == AppointmentStatus.Completed);
+        var summary = new ContactSummary(
+            Completed: await completed.CountAsync(ct),
+            NoShows: await all.CountAsync(a => a.Status == AppointmentStatus.NoShow, ct),
+            Cancelled: await all.CountAsync(a => a.Status == AppointmentStatus.Cancelled, ct),
+            FirstVisit: await completed.MinAsync(a => (DateTime?)a.StartsAt, ct),
+            LastVisit: await completed.MaxAsync(a => (DateTime?)a.StartsAt, ct));
 
         return new ContactProfile(
             contact,
@@ -149,9 +153,7 @@ public sealed class ContactQueries(AgendaDbContext db, TimeProvider clock)
         return await db.Appointments.AsNoTracking()
             .Where(a => a.StartsAt >= from && a.StartsAt < to && a.Status != AppointmentStatus.Cancelled)
             .OrderBy(a => a.StartsAt)
-            .Select(a => new AppointmentRow(
-                a.Id, a.StartsAt, a.EndsAt, a.Status, a.Patient!.Name, a.Location!.Name,
-                a.Service != null ? a.Service.Name : null, a.Source, a.InternalNotes, a.ContactId, a.Contact!.Name))
+            .Select(ToRow)
             .ToListAsync(ct);
     }
 }
