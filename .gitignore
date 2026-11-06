@@ -1,0 +1,9 @@
+bin/
+obj/
+.vs/
+.vscode/
+.idea/
+*.user
+TestResults/
+appsettings.*.local.json
+*.service-account.json

@@ -4,7 +4,7 @@ COPY src/Osteo.Agenda.Core/Osteo.Agenda.Core.csproj src/Osteo.Agenda.Core/
 COPY src/Osteo.Agenda.Web/Osteo.Agenda.Web.csproj src/Osteo.Agenda.Web/
 RUN dotnet restore src/Osteo.Agenda.Web/Osteo.Agenda.Web.csproj
 COPY src/ src/
-RUN dotnet publish src/Osteo.Agenda.Web/Osteo.Agenda.Web.csproj -c Release -o /app --no-restore
+RUN dotnet publish src/Osteo.Agenda.Web/Osteo.Agenda.Web.csproj -c Release -o /app
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0
 WORKDIR /app
