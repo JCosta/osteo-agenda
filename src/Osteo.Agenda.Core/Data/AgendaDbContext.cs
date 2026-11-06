@@ -51,6 +51,7 @@ public sealed class AgendaDbContext(DbContextOptions<AgendaDbContext> options)
         });
 
         b.Entity<AppointmentEvent>().HasOne<Appointment>().WithMany().HasForeignKey(x => x.AppointmentId);
+        b.Entity<AppointmentEvent>().Property(x => x.Data).HasColumnType("jsonb");        
         b.Entity<Service>().Property(x => x.Price).HasPrecision(10, 2);
         b.Entity<WorkingHours>().Property(x => x.DayOfWeek).HasConversion<int>();
 
