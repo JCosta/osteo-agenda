@@ -1,0 +1,42 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Agenda do dia";
+    var title = Model.CurrentDay.ToString("dddd, d 'de' MMMM", Format.Pt);
+}
+<div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+    <a class="btn btn-outline-secondary btn-sm" asp-page="/Index" asp-route-day="@Model.CurrentDay.AddDays(-1).ToString("yyyy-MM-dd")" aria-label="Dia anterior">&larr;</a>
+    <h1 class="h4 mb-0 text-capitalize">@title</h1>
+    <a class="btn btn-outline-secondary btn-sm" asp-page="/Index" asp-route-day="@Model.CurrentDay.AddDays(1).ToString("yyyy-MM-dd")" aria-label="Dia seguinte">&rarr;</a>
+    @if (!Model.IsToday)
+    {
+        <a class="btn btn-link btn-sm" asp-page="/Index">Hoje</a>
+    }
+</div>
+
+@if (Model.Appointments.Count == 0)
+{
+    <div class="card card-body text-secondary">Sem marcações neste dia.</div>
+}
+else
+{
+    <div class="card">
+        <ul class="list-group list-group-flush">
+            @foreach (var a in Model.Appointments)
+            {
+                <li class="list-group-item d-flex flex-wrap align-items-center gap-3">
+                    <span class="time-col fw-semibold">@Format.Range(a.StartsAt, a.EndsAt)</span>
+                    <a class="flex-grow-1 text-decoration-none" asp-page="/Contacts/Details" asp-route-id="@a.ContactId">
+                        @a.PatientName
+                        @if (!string.Equals(a.PatientName, a.ContactName, StringComparison.OrdinalIgnoreCase))
+                        {
+                            <span class="muted-small">· contacto: @a.ContactName</span>
+                        }
+                    </a>
+                    <span class="muted-small">@a.LocationName</span>
+                    <span class="badge @Format.StatusClass(a.Status)">@a.Status.Label()</span>
+                </li>
+            }
+        </ul>
+    </div>
+}

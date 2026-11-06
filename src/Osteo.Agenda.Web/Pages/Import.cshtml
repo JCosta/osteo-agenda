@@ -1,0 +1,123 @@
+@page
+@model ImportModel
+@{
+    ViewData["Title"] = "Importar do Google Calendar";
+}
+<h1 class="h4 mb-1">Importar do Google Calendar</h1>
+<p class="muted-small mb-3">
+    Lê eventos no formato <code>Nome #Telefone</code> (opcional <code>#Serviço</code>, <code>#sms</code>; <code>#bloqueio</code> para bloqueios).
+    Passado entra como histórico; futuro entra como marcação. Não é enviada nenhuma mensagem. Pode repetir sem criar duplicados.
+</p>
+
+@if (!Model.SourceConfigured)
+{
+    <div class="alert alert-warning">A ligação ao Google Calendar não está configurada (<code>GoogleCalendar__ServiceAccountJson</code>).</div>
+}
+@if (Model.Error is not null)
+{
+    <div class="alert alert-danger">@Model.Error</div>
+}
+@if (Model.Result is { } r)
+{
+    <div class="alert alert-success">
+        <strong>Importação concluída.</strong>
+        @r.AppointmentsCreated marcações criadas, @r.AppointmentsUpdated atualizadas,
+        @r.BlocksCreated bloqueios criados, @r.BlocksUpdated atualizados,
+        @r.ContactsCreated contactos e @r.PatientsCreated pacientes novos.
+        @r.Unchanged sem alterações, @r.Skipped ignorados.
+        <a asp-page="/Contacts/Index">Ver clientes</a>
+    </div>
+}
+
+<form method="post" class="card card-body mb-3">
+    <div class="row g-3 align-items-end">
+        <div class="col-12 col-md-3">
+            <label class="form-label" for="LocationId">Local</label>
+            <select class="form-select" asp-for="LocationId" asp-items="@(new SelectList(Model.Locations, nameof(Location.Id), nameof(Location.Name)))"></select>
+        </div>
+        <div class="col-12 col-md-4">
+            <label class="form-label" for="CalendarId">ID do calendário</label>
+            <input class="form-control" asp-for="CalendarId" placeholder="Usa o do local se vazio" />
+        </div>
+        <div class="col-6 col-md-2">
+            <label class="form-label" for="From">De</label>
+            <input class="form-control" asp-for="From" type="date" />
+        </div>
+        <div class="col-6 col-md-2">
+            <label class="form-label" for="To">Até</label>
+            <input class="form-control" asp-for="To" type="date" />
+        </div>
+        <div class="col-12 col-md-1 d-grid">
+            <button type="submit" asp-page-handler="Preview" class="btn btn-dark">Ver</button>
+        </div>
+    </div>
+
+    @if (Model.Preview is { } p)
+    {
+        <hr />
+        <div class="d-flex flex-wrap align-items-center gap-3">
+            <span><strong>@p.Count(ImportAction.Create)</strong> novos</span>
+            <span><strong>@p.Count(ImportAction.Update)</strong> a atualizar</span>
+            <span><strong>@p.Count(ImportAction.Unchanged)</strong> sem alterações</span>
+            <span class="text-danger"><strong>@p.Count(ImportAction.Skip)</strong> ignorados</span>
+            <span><strong>@p.NewContacts</strong> contactos novos</span>
+            <button type="submit" asp-page-handler="Commit" class="btn btn-success ms-md-auto"
+                    disabled="@(p.Count(ImportAction.Create) + p.Count(ImportAction.Update) == 0)">
+                Importar @(p.Count(ImportAction.Create) + p.Count(ImportAction.Update)) eventos
+            </button>
+        </div>
+    }
+</form>
+
+@if (Model.Preview is { } preview)
+{
+    var ordered = preview.Items
+        .OrderBy(i => i.Action == ImportAction.Skip ? 0 : i.Issues.Count > 0 ? 1 : 2)
+        .ThenBy(i => i.StartsAtUtc)
+        .ToList();
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-sm mb-0">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Título no calendário</th>
+                        <th>Resultado</th>
+                        <th>Estado</th>
+                        <th>Observações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var i in ordered)
+                    {
+                        var rowClass = i.Action == ImportAction.Skip ? "table-danger" : i.Issues.Count > 0 ? "table-warning" : "";
+                        <tr class="@rowClass">
+                            <td class="time-col">@Format.DateShort(i.StartsAtUtc) @(i.Event.IsAllDay ? "" : Format.Time(i.StartsAtUtc))</td>
+                            <td>@i.Event.Summary</td>
+                            <td>
+                                @(i.Action switch
+                                {
+                                    ImportAction.Create => i.Kind == ImportItemKind.Block ? "Novo bloqueio" : "Nova",
+                                    ImportAction.Update => "Atualizar",
+                                    ImportAction.Unchanged => "Sem alterações",
+                                    _ => "Ignorado",
+                                })
+                            </td>
+                            <td>
+                                @if (i.Status is { } st)
+                                {
+                                    <span class="badge @Format.StatusClass(st)">@st.Label()</span>
+                                }
+                                else if (i.BlockKind is { } bk)
+                                {
+                                    <span class="badge text-bg-dark">Bloqueio · @bk.Label()</span>
+                                }
+                            </td>
+                            <td class="issue">@string.Join(" · ", i.Issues.Select(x => x.Label()))</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

@@ -1,0 +1,29 @@
+@page
+@model LoginModel
+@{
+    ViewData["Title"] = "Entrar";
+}
+<div class="row justify-content-center mt-5">
+    <div class="col-12 col-sm-8 col-md-5 col-lg-4">
+        <h1 class="h4 mb-4 text-center">Agenda · Entrar</h1>
+        @if (Model.NotConfigured)
+        {
+            <div class="alert alert-warning">
+                O acesso ainda não está configurado. Defina <code>Admin__Email</code> e <code>Admin__PasswordHash</code>.
+            </div>
+        }
+        <form method="post" class="card card-body">
+            <div asp-validation-summary="ModelOnly" class="text-danger small mb-2"></div>
+            <input type="hidden" asp-for="ReturnUrl" />
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label">Email</label>
+                <input asp-for="Email" class="form-control" autocomplete="username" autofocus />
+            </div>
+            <div class="mb-3">
+                <label asp-for="Password" class="form-label">Palavra-passe</label>
+                <input asp-for="Password" class="form-control" autocomplete="current-password" />
+            </div>
+            <button type="submit" class="btn btn-dark w-100">Entrar</button>
+        </form>
+    </div>
+</div>

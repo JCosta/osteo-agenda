@@ -1,0 +1,50 @@
+@page
+@model Osteo.Agenda.Web.Pages.Contacts.IndexModel
+@{
+    ViewData["Title"] = "Clientes";
+}
+<h1 class="h4 mb-3">Clientes</h1>
+
+<form method="get" class="mb-3" role="search">
+    <div class="input-group">
+        <input class="form-control" name="q" value="@Model.Q" placeholder="Nome ou telefone" aria-label="Pesquisar por nome ou telefone" autofocus />
+        <button class="btn btn-dark" type="submit">Pesquisar</button>
+    </div>
+</form>
+
+@if (Model.Results.Count == 0)
+{
+    <div class="card card-body text-secondary">
+        @(string.IsNullOrWhiteSpace(Model.Q) ? "Ainda não há clientes. Comece por importar o Google Calendar." : "Nenhum cliente encontrado.")
+    </div>
+}
+else
+{
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Telefone</th>
+                        <th>Canal</th>
+                        <th>Próxima</th>
+                        <th>Última</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var c in Model.Results)
+                    {
+                        <tr>
+                            <td><a asp-page="/Contacts/Details" asp-route-id="@c.Id">@c.Name</a></td>
+                            <td class="time-col">@PhoneNormalizer.Display(c.PhoneE164)</td>
+                            <td>@c.PreferredChannel.Label()</td>
+                            <td class="time-col">@(c.NextAppointment is { } n ? Format.DateShort(n) + " " + Format.Time(n) : "—")</td>
+                            <td class="time-col">@(c.LastAppointment is { } l ? Format.DateShort(l) : "—")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

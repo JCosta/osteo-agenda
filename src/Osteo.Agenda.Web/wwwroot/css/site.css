@@ -1,0 +1,12 @@
+html { font-size: 15px; }
+@media (min-width: 768px) { html { font-size: 16px; } }
+
+body { background: #f7f7f5; }
+.card { border-color: #e6e4dd; }
+.table > :not(caption) > * > * { vertical-align: middle; }
+.badge { font-weight: 500; }
+.stat { font-size: 1.5rem; font-weight: 600; line-height: 1.1; }
+.stat-label { font-size: .8rem; color: var(--bs-secondary-color); }
+.muted-small { font-size: .85rem; color: var(--bs-secondary-color); }
+.issue { font-size: .8rem; }
+.time-col { white-space: nowrap; font-variant-numeric: tabular-nums; }

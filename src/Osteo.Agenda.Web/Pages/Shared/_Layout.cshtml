@@ -1,0 +1,40 @@
+﻿<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>@ViewData["Title"] · Agenda</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" crossorigin="anonymous" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <nav class="navbar navbar-expand-md bg-body border-bottom mb-3">
+            <div class="container">
+                <a class="navbar-brand fw-semibold" asp-page="/Index">Agenda</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav" aria-controls="nav" aria-expanded="false" aria-label="Menu">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="nav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item"><a class="nav-link" asp-page="/Index">Hoje</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-page="/Contacts/Index">Clientes</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-page="/Import">Importar</a></li>
+                    </ul>
+                    <form method="post" asp-page="/Logout" class="d-flex">
+                        <button type="submit" class="btn btn-link nav-link">Sair</button>
+                    </form>
+                </div>
+            </div>
+        </nav>
+    }
+    <main class="container pb-5">
+        @RenderBody()
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

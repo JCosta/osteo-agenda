@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Osteo.Agenda.Core/Osteo.Agenda.Core.csproj" />
+    <Project Path="src/Osteo.Agenda.Web/Osteo.Agenda.Web.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Osteo.Agenda.Tests/Osteo.Agenda.Tests.csproj" />
+  </Folder>
+</Solution>

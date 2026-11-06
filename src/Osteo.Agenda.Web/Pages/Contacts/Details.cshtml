@@ -1,0 +1,99 @@
+@page "{id:guid}"
+@model Osteo.Agenda.Web.Pages.Contacts.DetailsModel
+@{
+    var p = Model.Profile;
+    var c = p.Contact;
+    var s = p.Summary;
+    ViewData["Title"] = c.Name;
+    var multiplePatients = p.Patients.Count > 1;
+}
+<nav class="mb-2"><a asp-page="/Contacts/Index" class="muted-small">&larr; Clientes</a></nav>
+
+<div class="d-flex flex-wrap align-items-baseline gap-2 mb-3">
+    <h1 class="h4 mb-0">@c.Name</h1>
+    <span class="muted-small">@PhoneNormalizer.Display(c.PhoneE164)</span>
+    @if (!string.IsNullOrEmpty(c.Email))
+    {
+        <span class="muted-small">· @c.Email</span>
+    }
+    <span class="badge text-bg-light border">Avisos por @c.PreferredChannel.Label()</span>
+    @if (c.PhoneType == PhoneType.Landline)
+    {
+        <span class="badge text-bg-warning">Telefone fixo</span>
+    }
+    @if (c.WhatsappUnavailableSince is not null)
+    {
+        <span class="badge text-bg-warning">Sem WhatsApp</span>
+    }
+</div>
+
+<div class="row g-3 mb-3">
+    <div class="col-6 col-md-3"><div class="card card-body"><div class="stat">@s.Completed</div><div class="stat-label">Consultas realizadas</div></div></div>
+    <div class="col-6 col-md-3"><div class="card card-body">
+        <div class="stat">@(s.LastVisit is { } last ? Format.Ago(last, Model.NowUtc) : "—")</div>
+        <div class="stat-label">Última consulta@(s.LastVisit is { } l2 ? " · " + Format.DateShort(l2) : "")</div>
+    </div></div>
+    <div class="col-6 col-md-3"><div class="card card-body"><div class="stat">@s.NoShows · @s.Cancelled</div><div class="stat-label">Faltas · cancelamentos</div></div></div>
+    <div class="col-6 col-md-3"><div class="card card-body"><div class="stat">@(s.FirstVisit is { } first ? Format.DateShort(first) : "—")</div><div class="stat-label">Primeira consulta</div></div></div>
+</div>
+
+@if (multiplePatients)
+{
+    <div class="mb-3 muted-small">
+        Pacientes deste contacto:
+        @foreach (var patient in p.Patients)
+        {
+            <span class="badge text-bg-light border me-1">@patient.Name</span>
+        }
+    </div>
+}
+
+<div class="card mb-3">
+    <div class="card-header bg-body fw-semibold">Próximas marcações (@p.Upcoming.Count)</div>
+    @if (p.Upcoming.Count == 0)
+    {
+        <div class="card-body text-secondary">Sem marcações futuras.</div>
+    }
+    else
+    {
+        <ul class="list-group list-group-flush">
+            @foreach (var a in p.Upcoming)
+            {
+                <li class="list-group-item d-flex flex-wrap align-items-center gap-3">
+                    <span class="time-col fw-semibold">@Format.Date(a.StartsAt) · @Format.Range(a.StartsAt, a.EndsAt)</span>
+                    @if (multiplePatients) { <span>@a.PatientName</span> }
+                    <span class="muted-small flex-grow-1">@a.LocationName@(a.ServiceName is null ? "" : " · " + a.ServiceName)</span>
+                    <span class="badge @Format.StatusClass(a.Status)">@a.Status.Label()</span>
+                </li>
+            }
+        </ul>
+    }
+</div>
+
+<div class="card">
+    <div class="card-header bg-body fw-semibold d-flex justify-content-between">
+        <span>Histórico (@p.HistoryTotal)</span>
+        @if (!Model.All && p.HistoryTotal > p.History.Count)
+        {
+            <a asp-page="/Contacts/Details" asp-route-id="@c.Id" asp-route-all="true" class="fw-normal">Ver todas</a>
+        }
+    </div>
+    @if (p.History.Count == 0)
+    {
+        <div class="card-body text-secondary">Sem consultas anteriores.</div>
+    }
+    else
+    {
+        <ul class="list-group list-group-flush">
+            @foreach (var a in p.History)
+            {
+                <li class="list-group-item d-flex flex-wrap align-items-center gap-3">
+                    <span class="time-col">@Format.Date(a.StartsAt) · @Format.Time(a.StartsAt)</span>
+                    @if (multiplePatients) { <span>@a.PatientName</span> }
+                    <span class="muted-small flex-grow-1">@a.LocationName@(a.ServiceName is null ? "" : " · " + a.ServiceName)</span>
+                    <span class="badge @Format.StatusClass(a.Status)">@a.Status.Label()</span>
+                </li>
+            }
+        </ul>
+    }
+</div>
